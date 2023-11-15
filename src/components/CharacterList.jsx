@@ -1,10 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Character } from "./Character";
+import { FavoritesContext } from "../context/favoritesContext";
 
 function NavPage({ page, setPage }) {
   return (
     <header className="d-flex justify-content-between align-items-center">
-      <p>Page: {page}</p>
+      <button
+        className="btn btn-primary btn-sm"
+        onClick={() => setPage(page - 1)}
+      >
+        Regresar a pagina {page - 1}
+      </button>
 
       <button
         className="btn btn-primary btn-sm"
@@ -21,10 +27,12 @@ export function CharacterList() {
   const [characters, setCharacters] = useState([]);
   const [page, setPage] = useState(1);
 
+  const { favorites, addAndRemoveFavorite } = useContext(FavoritesContext);
+
   useEffect(() => {
     async function fetchData() {
       const data = await fetch(
-        `https://rickandmortyapi.com/api/character?page=${page}`
+        `https://rickandmortyapi.com/api/character/?page=${page}`
       );
       const { results } = await data.json();
       setCharacters(results);
@@ -48,6 +56,15 @@ export function CharacterList() {
                 name={character.name}
                 origin={character.origin}
                 image={character.image}
+                onClick={() => {
+                  addAndRemoveFavorite({
+                    id: character.id,
+                    name: character.name,
+                    origin: character.origin,
+                    image: character.image,
+                  });
+                }}
+                isFavorite={favorites.some((item) => item.id === character.id)}
               />
             </div>
           ))}
